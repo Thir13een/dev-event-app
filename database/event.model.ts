@@ -8,7 +8,7 @@ export interface IEvent extends Document {
     image: string;
     venue: string;
     location: string;
-    date: string;
+    date: Date;
     time: string;
     mode: string;
     audience: string;
@@ -56,7 +56,7 @@ const EventSchema = new Schema<IEvent>(
             trim: true,
         },
         date: {
-            type: String,
+            type: Date,
             required: [true, "Date is required"],
         },
         time: {
@@ -115,12 +115,13 @@ EventSchema.pre("save", function () {
             .replace(/-+/g, "-");
     }
 
-    if (event.isModified("date")) {
-        const parsedDate = new Date(event.date);
-        if (isNaN(parsedDate.getTime())) {
+    if (event.isModified("date") || event.isNew) {
+        const date = new Date(event.date);
+        if (isNaN(date.getTime())) {
             throw new Error("Invalid date format");
         }
-        event.date = parsedDate.toISOString().split("T")[0];
+        date.setUTCHours(0, 0, 0, 0);
+        event.date = date;
     }
 
     if (event.isModified("time")) {

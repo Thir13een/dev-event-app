@@ -1,5 +1,6 @@
 import ExploreBtn from "@/components/ExploreBtn";
 import EventCard from "@/components/EventCard";
+import { IEvent } from "@/database";
 
 const Page = async () => {
     try {
@@ -29,8 +30,8 @@ const Page = async () => {
 
                     {events && events.length > 0 ? (
                         <ul className="events">
-                            {events.map((event: any) => (
-                                <li key={event._id} className="list-none">
+                            {events.map((event: IEvent) => (
+                                <li key={event._id.toString()} className="list-none">
                                     <EventCard
                                         title={event.title}
                                         image={event.image}
@@ -52,7 +53,7 @@ const Page = async () => {
                 </div>
             </section>
         );
-    } catch (error) {
+    } catch {
         return (
             <section>
                 <h1 className="text-center">

@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { formatEventDate, formatEventTime, parseArrayField } from "@/lib/utils";
 
 const EventDetailItem = ({icon, alt, label} : {icon: string, alt: string, label: string}) => (
     <div className="flex flex-row items-center gap-3 py-1">
@@ -10,53 +11,44 @@ const EventDetailItem = ({icon, alt, label} : {icon: string, alt: string, label:
 
 export default async function EventDetailsPage({params} : {params: Promise<{slug: string}>}) {
     const {slug} = await params;
-    const request = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/events/${slug}`, {
-        cache: 'no-store'
-    });
-    const {event} = await request.json();
 
-    if(!event) return (
-        <section id="event">
-            <div className="header">
-                <h1>Event Not Found</h1>
-                <p className="mt-2">The event &quot;{slug}&quot; could not be found.</p>
-            </div>
-        </section>
-    )
+    let event = null;
+    let errorMessage = null;
 
-    const eventDate = new Date(event.date);
-    const formattedDate = eventDate.toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-    });
+    try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/events/${slug}`, {
+            cache: 'no-store'
+        });
 
-    // Format time to 12-hour format
-    const [hours, minutes] = event.time.split(':');
-    const hour = parseInt(hours);
-    const ampm = hour >= 12 ? 'PM' : 'AM';
-    const displayHour = hour % 12 || 12;
-    const formattedTime = `${displayHour}:${minutes} ${ampm}`;
-
-    // Parse agenda - handle if it's stored as array with JSON string inside
-    let agendaItems = event.agenda;
-    if (Array.isArray(agendaItems) && agendaItems.length === 1 && typeof agendaItems[0] === 'string') {
-        try {
-            agendaItems = JSON.parse(agendaItems[0]);
-        } catch (e) {
-            // If parsing fails, keep original
+        if (!response.ok) {
+            errorMessage = `Failed to fetch event (${response.status})`;
+        } else {
+            const data = await response.json();
+            event = data.event;
         }
+    } catch (error) {
+        errorMessage = error instanceof Error ? error.message : 'Failed to load event';
     }
 
-    // Parse tags - handle if it's stored as array with JSON string inside
-    let tagItems = event.tags;
-    if (Array.isArray(tagItems) && tagItems.length === 1 && typeof tagItems[0] === 'string') {
-        try {
-            tagItems = JSON.parse(tagItems[0]);
-        } catch (e) {
-            // If parsing fails, keep original
-        }
+    if (errorMessage || !event) {
+        return (
+            <section id="event">
+                <div className="header">
+                    <h1>Event Not Found</h1>
+                    <p className="mt-2">
+                        {errorMessage || `The event "${slug}" could not be found.`}
+                    </p>
+                </div>
+            </section>
+        );
     }
+
+    const formattedDate = formatEventDate(event.date);
+    const formattedTime = formatEventTime(event.time);
+
+    // Parse agenda and tags safely
+    const agendaItems = parseArrayField(event.agenda || []);
+    const tagItems = parseArrayField(event.tags || []);
 
     return (
         <section id="event" className="py-2">
@@ -136,7 +128,7 @@ export default async function EventDetailsPage({params} : {params: Promise<{slug
                     </section>
 
                     {tagItems && tagItems.length > 0 && (
-                        <section className="flex-col-gap-2">
+                        <section className="flex-col-gap-2 mb-6">
                             <h2 className="mb-2">Tags</h2>
                             <div className="flex flex-row flex-wrap gap-3">
                                 {tagItems.map((tag: string, index: number) => (
@@ -147,40 +139,14 @@ export default async function EventDetailsPage({params} : {params: Promise<{slug
                             </div>
                         </section>
                     )}
+
+                    <Link
+                        href={`/events/${slug}/book`}
+                        className="bg-primary hover:bg-primary/90 w-full max-w-md cursor-pointer flex items-center justify-center rounded-[6px] px-6 py-3 text-lg font-semibold text-black transition-colors"
+                    >
+                        Book Now
+                    </Link>
                 </div>
-
-                <aside className="booking">
-                    <div className="signup-card sticky top-24">
-                        <div className="flex flex-col gap-2 pb-4 border-b border-gray-700">
-                            <h3 className="text-xl font-bold">Book Your Spot</h3>
-                            <p className="text-light-200 text-sm leading-relaxed">
-                                Secure your attendance at this event
-                            </p>
-                        </div>
-
-                        <div className="flex flex-col gap-4 py-4">
-                            <div className="flex items-center gap-3">
-                                <Image src="/icons/calendar.svg" alt="Date" width={16} height={16} />
-                                <p className="text-light-200 text-sm">{formattedDate}</p>
-                            </div>
-                            <div className="flex items-center gap-3">
-                                <Image src="/icons/clock.svg" alt="Time" width={16} height={16} />
-                                <p className="text-light-200 text-sm">{formattedTime}</p>
-                            </div>
-                            <div className="flex items-center gap-3">
-                                <Image src="/icons/mode.svg" alt="Mode" width={16} height={16} />
-                                <p className="text-light-200 text-sm capitalize">{event.mode}</p>
-                            </div>
-                        </div>
-
-                        <Link
-                            href={`/events/${slug}/book`}
-                            className="bg-primary hover:bg-primary/90 w-full cursor-pointer flex items-center justify-center rounded-[6px] px-4 py-3 text-lg font-semibold text-black transition-colors mt-2"
-                        >
-                            Book Now
-                        </Link>
-                    </div>
-                </aside>
             </div>
         </section>
     )

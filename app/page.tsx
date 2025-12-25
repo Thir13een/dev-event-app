@@ -2,7 +2,8 @@ import EventCard from "@/components/EventCard";
 import Link from "next/link";
 import { IEvent } from "@/database";
 import { formatEventDate, formatEventTime } from "@/lib/utils";
-import { getBaseUrl } from "@/lib/server-url";
+import Event from "@/database/event.model";
+import connectDB from "@/lib/mongodb";
 
 // Temporarily force dynamic rendering until site is working
 // TODO: Switch back to ISR caching later (export const revalidate = 60)
@@ -10,24 +11,29 @@ export const dynamic = 'force-dynamic';
 
 const Page = async () => {
     try {
-        // Use absolute URL for Vercel deployment
-        const baseUrl = process.env.VERCEL_URL
-            ? `https://${process.env.VERCEL_URL}`
-            : await getBaseUrl();
+        // Query MongoDB directly (avoid HTTP fetch issues on Vercel)
+        await connectDB();
 
-        // Fetch only 6 events for featured section
-        const response = await fetch(`${baseUrl}/api/events?limit=6`, {
-            next: { revalidate: 60 },
-        });
+        const events = await Event.find()
+            .sort({ createdAt: -1 })
+            .limit(6)
+            .lean();
 
-        if (!response.ok) {
-            throw new Error('Failed to fetch events');
-        }
+        const totalEvents = await Event.countDocuments();
 
-        const { events, pagination } = await response.json();
+        // Convert MongoDB documents to plain objects for client
+        const featuredEvents = events.map(event => ({
+            ...event,
+            _id: event._id.toString(),
+            date: event.date.toISOString(),
+            startAtUtc: event.startAtUtc.toISOString(),
+            createdAt: event.createdAt.toISOString(),
+            updatedAt: event.updatedAt.toISOString(),
+        })) as unknown as IEvent[];
 
-        // Use the fetched events directly (already limited to 6)
-        const featuredEvents = events;
+        const pagination = {
+            total: totalEvents
+        };
 
         return (
             <section>

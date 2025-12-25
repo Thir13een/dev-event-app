@@ -1,5 +1,7 @@
 import EventsListWithFilters from "@/components/EventsListWithFilters";
-import { getBaseUrl } from "@/lib/server-url";
+import Event from "@/database/event.model";
+import connectDB from "@/lib/mongodb";
+import { IEvent } from "@/database";
 
 // Temporarily force dynamic rendering until site is working
 // TODO: Switch back to ISR caching later (export const revalidate = 60)
@@ -7,22 +9,23 @@ export const dynamic = 'force-dynamic';
 
 const EventsPage = async () => {
     try {
-        // Use absolute URL for Vercel deployment
-        const baseUrl = process.env.VERCEL_URL
-            ? `https://${process.env.VERCEL_URL}`
-            : await getBaseUrl();
+        // Query MongoDB directly (avoid HTTP fetch issues on Vercel)
+        await connectDB();
 
-        // Fetch all events with high limit for client-side filtering
-        // EventsListWithFilters needs all events to filter/sort properly
-        const response = await fetch(`${baseUrl}/api/events?limit=100`, {
-            next: { revalidate: 60 },
-        });
+        const dbEvents = await Event.find()
+            .sort({ createdAt: -1 })
+            .limit(100)
+            .lean();
 
-        if (!response.ok) {
-            throw new Error('Failed to fetch events');
-        }
-
-        const { events } = await response.json();
+        // Convert MongoDB documents to plain objects for client
+        const events = dbEvents.map(event => ({
+            ...event,
+            _id: event._id.toString(),
+            date: event.date.toISOString(),
+            startAtUtc: event.startAtUtc.toISOString(),
+            createdAt: event.createdAt.toISOString(),
+            updatedAt: event.updatedAt.toISOString(),
+        })) as unknown as IEvent[];
 
         return (
             <section>

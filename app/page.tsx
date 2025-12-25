@@ -4,7 +4,9 @@ import { IEvent } from "@/database";
 import { formatEventDate, formatEventTime } from "@/lib/utils";
 import { getBaseUrl } from "@/lib/server-url";
 
-export const revalidate = 60;
+// Temporarily force dynamic rendering until site is working
+// TODO: Switch back to ISR caching later (export const revalidate = 60)
+export const dynamic = 'force-dynamic';
 
 const Page = async () => {
     try {

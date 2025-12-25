@@ -3,7 +3,9 @@ import Link from "next/link";
 import { formatEventDate, formatEventTime, parseArrayField } from "@/lib/utils";
 import { getBaseUrl } from "@/lib/server-url";
 
-export const revalidate = 60;
+// Temporarily force dynamic rendering until site is working
+// TODO: Switch back to ISR caching later (export const revalidate = 60)
+export const dynamic = 'force-dynamic';
 
 const EventDetailItem = ({icon, alt, label} : {icon: string, alt: string, label: string}) => (
     <div className="flex flex-row items-center gap-3 py-1">

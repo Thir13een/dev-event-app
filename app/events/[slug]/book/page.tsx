@@ -3,7 +3,9 @@ import BookingForm from "@/components/BookingForm";
 import { formatEventDate, formatEventTime } from "@/lib/utils";
 import { getBaseUrl } from "@/lib/server-url";
 
-export const revalidate = 60;
+// Temporarily force dynamic rendering until site is working
+// TODO: Switch back to ISR caching later (export const revalidate = 60)
+export const dynamic = 'force-dynamic';
 
 export default async function BookEventPage({params}: {params: Promise<{slug: string}>}) {
     const {slug} = await params;

@@ -1,7 +1,9 @@
 import EventsListWithFilters from "@/components/EventsListWithFilters";
 import { getBaseUrl } from "@/lib/server-url";
 
-export const revalidate = 60;
+// Temporarily force dynamic rendering until site is working
+// TODO: Switch back to ISR caching later (export const revalidate = 60)
+export const dynamic = 'force-dynamic';
 
 const EventsPage = async () => {
     try {

@@ -1,14 +1,15 @@
 import "server-only";
-import { headers } from "next/headers";
 
 export async function getBaseUrl(): Promise<string> {
-    const requestHeaders = await headers();
-    const host = requestHeaders.get("x-forwarded-host") || requestHeaders.get("host");
-    const protocol = requestHeaders.get("x-forwarded-proto") || "http";
-
-    if (!host) {
-        return "http://localhost:3000";
+    // For Netlify deployment, use environment variables
+    if (process.env.URL) {
+        return process.env.URL; // Netlify automatically sets this
     }
 
-    return `${protocol}://${host}`;
+    if (process.env.VERCEL_URL) {
+        return `https://${process.env.VERCEL_URL}`; // Vercel support
+    }
+
+    // Fallback to localhost for development
+    return process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
 }

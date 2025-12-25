@@ -1,7 +1,7 @@
 import Image from "next/image";
 import BookingForm from "@/components/BookingForm";
 import { formatEventDate, formatEventTime } from "@/lib/utils";
-import { getBaseUrl } from "@/lib/server-url";
+import { getEventBySlug } from "@/lib/queries";
 
 export const revalidate = 60;
 
@@ -12,16 +12,11 @@ export default async function BookEventPage({params}: {params: Promise<{slug: st
     let errorMessage = null;
 
     try {
-        const baseUrl = getBaseUrl();
-        const response = await fetch(`${baseUrl}/api/events/${slug}`, {
-            next: { revalidate: 60 }
-        });
+        // Fetch event directly from MongoDB
+        event = await getEventBySlug(slug);
 
-        if (!response.ok) {
-            errorMessage = `Failed to fetch event (${response.status})`;
-        } else {
-            const data = await response.json();
-            event = data.event;
+        if (!event) {
+            errorMessage = `Event not found`;
         }
     } catch (error) {
         errorMessage = error instanceof Error ? error.message : 'Failed to load event';

@@ -1,22 +1,13 @@
 import EventsListWithFilters from "@/components/EventsListWithFilters";
-import { getBaseUrl } from "@/lib/server-url";
+import { getEvents } from "@/lib/queries";
 
 export const revalidate = 60;
 
 const EventsPage = async () => {
     try {
-        const baseUrl = getBaseUrl();
-        // Fetch all events with high limit for client-side filtering
+        // Fetch all events directly from MongoDB for client-side filtering
         // EventsListWithFilters needs all events to filter/sort properly
-        const response = await fetch(`${baseUrl}/api/events?limit=100`, {
-            next: { revalidate: 60 },
-        });
-
-        if (!response.ok) {
-            throw new Error('Failed to fetch events');
-        }
-
-        const { events } = await response.json();
+        const { events } = await getEvents(100);
 
         return (
             <section>

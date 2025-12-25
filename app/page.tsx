@@ -2,23 +2,14 @@ import EventCard from "@/components/EventCard";
 import Link from "next/link";
 import { IEvent } from "@/database";
 import { formatEventDate, formatEventTime } from "@/lib/utils";
-import { getBaseUrl } from "@/lib/server-url";
+import { getEvents } from "@/lib/queries";
 
 export const revalidate = 60;
 
 const Page = async () => {
     try {
-        const baseUrl = getBaseUrl();
-        // Fetch only 6 events for featured section
-        const response = await fetch(`${baseUrl}/api/events?limit=6`, {
-            next: { revalidate: 60 },
-        });
-
-        if (!response.ok) {
-            throw new Error('Failed to fetch events');
-        }
-
-        const { events, pagination } = await response.json();
+        // Fetch only 6 events for featured section directly from MongoDB
+        const { events, pagination } = await getEvents(6);
 
         // Use the fetched events directly (already limited to 6)
         const featuredEvents = events;

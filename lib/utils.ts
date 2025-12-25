@@ -6,6 +6,15 @@ dayjs.extend(utc);
 dayjs.extend(timezone);
 
 /**
+ * Format timezone name for display (replace underscores with spaces)
+ * @param timezone - IANA timezone (e.g., "America/New_York")
+ * @returns Formatted timezone (e.g., "America/New York")
+ */
+function formatTimezoneForDisplay(timezone: string): string {
+    return timezone.replace(/_/g, ' ');
+}
+
+/**
  * Format a date to a human-readable string
  * @param date - Date object or ISO string
  * @param timezone - IANA time zone (e.g., "Asia/Kolkata")
@@ -48,7 +57,7 @@ export function formatEventTime(
         const localized = dayjs.utc(startAtUtc).tz(eventTimezone);
         if (localized.isValid()) {
             const timeLabel = localized.format("h:mm A");
-            return `${timeLabel} (${eventTimezone})`;
+            return `${timeLabel} (${formatTimezoneForDisplay(eventTimezone)})`;
         }
     }
 
@@ -66,7 +75,7 @@ export function formatEventTime(
     const ampm = hour >= 12 ? 'PM' : 'AM';
     const displayHour = hour % 12 || 12;
     const timeLabel = `${displayHour}:${minutes} ${ampm}`;
-    return eventTimezone ? `${timeLabel} (${eventTimezone})` : timeLabel;
+    return eventTimezone ? `${timeLabel} (${formatTimezoneForDisplay(eventTimezone)})` : timeLabel;
 }
 
 /**

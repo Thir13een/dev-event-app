@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="public/icons/logo.png" alt="DevEvent Logo" width="80" height="80">
+<img src="public/icons/logo.png" alt="DevEvent Logo" width="50" height="50">
 
 # DevEvent
 

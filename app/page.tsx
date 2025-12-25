@@ -24,12 +24,31 @@ const Page = async () => {
 
         console.log(`Found ${events.length} events`);
 
+        // Log first event structure to debug
+        if (events.length > 0) {
+            console.log('First event sample:', {
+                hasDate: !!events[0].date,
+                hasStartAtUtc: !!events[0].startAtUtc,
+                hasCreatedAt: !!events[0].createdAt,
+                fields: Object.keys(events[0])
+            });
+        }
+
         const totalEvents = await Event.countDocuments();
         console.log(`Total events in database: ${totalEvents}`);
 
         // Convert MongoDB documents to plain objects for client
         const featuredEvents = events
-            .filter(event => event.date && event.startAtUtc) // Only include events with required dates
+            .filter(event => {
+                const hasRequired = event.date && event.startAtUtc;
+                if (!hasRequired) {
+                    console.log('Filtering out event:', event.title || 'unknown', {
+                        hasDate: !!event.date,
+                        hasStartAtUtc: !!event.startAtUtc
+                    });
+                }
+                return hasRequired;
+            })
             .map(event => ({
                 ...event,
                 _id: event._id.toString(),

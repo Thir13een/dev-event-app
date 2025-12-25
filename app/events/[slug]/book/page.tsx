@@ -1,6 +1,9 @@
 import Image from "next/image";
 import BookingForm from "@/components/BookingForm";
 import { formatEventDate, formatEventTime } from "@/lib/utils";
+import { getBaseUrl } from "@/lib/server-url";
+
+export const revalidate = 60;
 
 export default async function BookEventPage({params}: {params: Promise<{slug: string}>}) {
     const {slug} = await params;
@@ -9,8 +12,9 @@ export default async function BookEventPage({params}: {params: Promise<{slug: st
     let errorMessage = null;
 
     try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/events/${slug}`, {
-            cache: 'no-store'
+        const baseUrl = await getBaseUrl();
+        const response = await fetch(`${baseUrl}/api/events/${slug}`, {
+            next: { revalidate: 60 }
         });
 
         if (!response.ok) {
@@ -34,8 +38,8 @@ export default async function BookEventPage({params}: {params: Promise<{slug: st
         );
     }
 
-    const formattedDate = formatEventDate(event.date);
-    const formattedTime = formatEventTime(event.time);
+    const formattedDate = formatEventDate(event.date, event.timezone, event.startAtUtc);
+    const formattedTime = formatEventTime(event.time, event.timezone, event.startAtUtc);
 
     return (
         <section id="book-event">

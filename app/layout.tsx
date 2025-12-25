@@ -1,22 +1,23 @@
 import type { Metadata } from "next";
-import { Schibsted_Grotesk, Martian_Mono } from "next/font/google";
+import { DM_Sans, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import LightRays from "@/components/LightRays";
 import Navbar from "@/components/Navbar";
+import React from "react";
 
-const schibstedGrotesk = Schibsted_Grotesk({
-  variable: "--font-schibsted-grotesk",
+const dmSans = DM_Sans({
+  variable: "--font-dm-sans",
   subsets: ["latin"],
 });
 
-const martianMono = Martian_Mono({
-  variable: "--font-martian-mono",
+const spaceGrotesk = Space_Grotesk({
+  variable: "--font-space-grotesk",
   subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
   title: "DevEvent",
-  description: "The Hub for Every Dev Event You Mustn't Miss",
+  description: "The Hub for Every Dev Event You Can't Miss",
 };
 
 export default function RootLayout({
@@ -27,7 +28,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${schibstedGrotesk.variable} ${martianMono.variable} min-h-screen antialiased`}
+        className={`${dmSans.variable} ${spaceGrotesk.variable} min-h-screen antialiased`}
       >
       <Navbar />
 
@@ -48,6 +49,7 @@ export default function RootLayout({
           <main>
             {children}
           </main>
+          <div id="date-time-picker-portal" />
       </body>
     </html>
   );

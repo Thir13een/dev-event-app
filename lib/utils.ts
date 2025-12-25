@@ -1,33 +1,57 @@
-import { type ClassValue, clsx } from "clsx";
-import { twMerge } from "tailwind-merge";
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
 
-/**
- * Utility function to merge Tailwind CSS classes
- */
-export function cn(...inputs: ClassValue[]) {
-    return twMerge(clsx(inputs));
-}
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 /**
  * Format a date to a human-readable string
  * @param date - Date object or ISO string
+ * @param timezone - IANA time zone (e.g., "Asia/Kolkata")
+ * @param startAtUtc - UTC start time (Date or ISO string)
  * @returns Formatted date string (e.g., "June 10, 2026")
  */
-export function formatEventDate(date: Date | string): string {
+export function formatEventDate(
+    date: Date | string,
+    eventTimezone?: string,
+    startAtUtc?: Date | string
+): string {
+    if (eventTimezone && startAtUtc) {
+        const localized = dayjs.utc(startAtUtc).tz(eventTimezone);
+        if (localized.isValid()) {
+            return localized.format("MMMM D, YYYY");
+        }
+    }
+
     const eventDate = new Date(date);
-    return eventDate.toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
+    return eventDate.toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
     });
 }
 
 /**
  * Format 24-hour time to 12-hour format with AM/PM
  * @param time - Time string in HH:MM format (24-hour)
+ * @param timezone - IANA time zone (e.g., "Asia/Kolkata")
+ * @param startAtUtc - UTC start time (Date or ISO string)
  * @returns Formatted time string (e.g., "9:00 AM")
  */
-export function formatEventTime(time: string): string {
+export function formatEventTime(
+    time: string,
+    eventTimezone?: string,
+    startAtUtc?: Date | string
+): string {
+    if (eventTimezone && startAtUtc) {
+        const localized = dayjs.utc(startAtUtc).tz(eventTimezone);
+        if (localized.isValid()) {
+            const timeLabel = localized.format("h:mm A");
+            return `${timeLabel} (${eventTimezone})`;
+        }
+    }
+
     if (!time || !time.includes(':')) {
         return 'Time TBA';
     }
@@ -41,7 +65,8 @@ export function formatEventTime(time: string): string {
 
     const ampm = hour >= 12 ? 'PM' : 'AM';
     const displayHour = hour % 12 || 12;
-    return `${displayHour}:${minutes} ${ampm}`;
+    const timeLabel = `${displayHour}:${minutes} ${ampm}`;
+    return eventTimezone ? `${timeLabel} (${eventTimezone})` : timeLabel;
 }
 
 /**

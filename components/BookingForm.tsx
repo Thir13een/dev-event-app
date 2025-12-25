@@ -99,7 +99,7 @@ export default function BookingForm({ eventId, eventSlug }: BookingFormProps) {
                         placeholder="your.email@example.com"
                         required
                         disabled={loading}
-                        className="w-full"
+                        className="w-full px-4 py-2 bg-dark-100 border border-dark rounded-lg focus:outline-none focus:border-blue"
                     />
                 </div>
 
@@ -112,7 +112,7 @@ export default function BookingForm({ eventId, eventSlug }: BookingFormProps) {
                 <button
                     type="submit"
                     disabled={loading}
-                    className="disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full px-6 py-3 mt-6 glass border-2 border-blue/30 font-medium rounded-lg hover:border-blue hover:shadow-lg hover:shadow-blue/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all text-gradient"
                 >
                     {loading ? "Booking..." : "Confirm Booking"}
                 </button>

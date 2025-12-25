@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import connectDB from "@/lib/mongodb";
 import Booking from "@/database/booking.model";
 import Event from "@/database/event.model";
+import { Types } from "mongoose";
 
 export async function POST(req: NextRequest) {
     try {
@@ -27,6 +28,13 @@ export async function POST(req: NextRequest) {
             );
         }
 
+        if (!Types.ObjectId.isValid(eventId)) {
+            return NextResponse.json(
+                { message: "Invalid event ID" },
+                { status: 400 }
+            );
+        }
+
         // Check if event exists
         const event = await Event.findById(eventId);
         if (!event) {
@@ -36,20 +44,8 @@ export async function POST(req: NextRequest) {
             );
         }
 
-        // Check if user already booked this event
-        const existingBooking = await Booking.findOne({
-            eventId,
-            email: email.toLowerCase(),
-        });
-
-        if (existingBooking) {
-            return NextResponse.json(
-                { message: "You have already booked this event" },
-                { status: 409 }
-            );
-        }
-
-        // Create booking
+        // Create booking (duplicate bookings prevented by unique compound index)
+        // If duplicate, MongoDB will throw error code 11000, caught below
         const booking = await Booking.create({
             eventId,
             email: email.toLowerCase(),
@@ -63,11 +59,27 @@ export async function POST(req: NextRequest) {
             { status: 201 }
         );
     } catch (error) {
-        console.error("Error creating booking:", error);
+        if (error && typeof error === "object" && "code" in error) {
+            const code = (error as { code?: number }).code;
+            if (code === 11000) {
+                return NextResponse.json(
+                    { message: "You have already booked this event" },
+                    { status: 409 }
+                );
+            }
+        }
+
+        // Log detailed error only in development
+        if (process.env.NODE_ENV === "development") {
+            console.error("Error creating booking:", error);
+        }
+
         return NextResponse.json(
             {
                 message: "Failed to create booking",
-                error: error instanceof Error ? error.message : "Unknown error",
+                ...(process.env.NODE_ENV === "development" && {
+                    error: error instanceof Error ? error.message : "Unknown error"
+                })
             },
             { status: 500 }
         );
@@ -82,6 +94,13 @@ export async function GET(req: NextRequest) {
         const eventId = searchParams.get("eventId");
 
         if (eventId) {
+            if (!Types.ObjectId.isValid(eventId)) {
+                return NextResponse.json(
+                    { message: "Invalid event ID" },
+                    { status: 400 }
+                );
+            }
+
             // Get bookings for specific event
             const bookings = await Booking.find({ eventId }).sort({ createdAt: -1 });
             return NextResponse.json(
@@ -105,11 +124,17 @@ export async function GET(req: NextRequest) {
             { status: 200 }
         );
     } catch (error) {
-        console.error("Error fetching bookings:", error);
+        // Log detailed error only in development
+        if (process.env.NODE_ENV === "development") {
+            console.error("Error fetching bookings:", error);
+        }
+
         return NextResponse.json(
             {
                 message: "Failed to fetch bookings",
-                error: error instanceof Error ? error.message : "Unknown error",
+                ...(process.env.NODE_ENV === "development" && {
+                    error: error instanceof Error ? error.message : "Unknown error"
+                })
             },
             { status: 500 }
         );

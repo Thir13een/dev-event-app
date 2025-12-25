@@ -5,11 +5,12 @@ export interface IEvent extends Document {
     slug: string;
     description: string;
     overview: string;
-    image: string;
     venue: string;
     location: string;
     date: Date;
     time: string;
+    timezone: string;
+    startAtUtc: Date;
     mode: string;
     audience: string;
     agenda: string[];
@@ -41,10 +42,6 @@ const EventSchema = new Schema<IEvent>(
             required: [true, "Overview is required"],
             trim: true,
         },
-        image: {
-            type: String,
-            required: [true, "Image is required"],
-        },
         venue: {
             type: String,
             required: [true, "Venue is required"],
@@ -63,6 +60,15 @@ const EventSchema = new Schema<IEvent>(
             type: String,
             required: [true, "Time is required"],
         },
+        timezone: {
+            type: String,
+            required: [true, "Timezone is required"],
+            trim: true,
+        },
+        startAtUtc: {
+            type: Date,
+            required: [true, "Start time is required"],
+        },
         mode: {
             type: String,
             required: [true, "Mode is required"],
@@ -80,7 +86,10 @@ const EventSchema = new Schema<IEvent>(
             type: [String],
             required: [true, "Agenda is required"],
             validate: {
-                validator: (v: string[]) => v.length > 0,
+                validator: (v: string[]) =>
+                    Array.isArray(v) &&
+                    v.length > 0 &&
+                    v.every((item) => typeof item === "string" && item.trim().length > 0),
                 message: "Agenda must have at least one item",
             },
         },
@@ -93,7 +102,10 @@ const EventSchema = new Schema<IEvent>(
             type: [String],
             required: [true, "Tags are required"],
             validate: {
-                validator: (v: string[]) => v.length > 0,
+                validator: (v: string[]) =>
+                    Array.isArray(v) &&
+                    v.length > 0 &&
+                    v.every((item) => typeof item === "string" && item.trim().length > 0),
                 message: "Tags must have at least one item",
             },
         },
@@ -103,18 +115,15 @@ const EventSchema = new Schema<IEvent>(
     }
 );
 
+// Indexes for performance optimization
+EventSchema.index({ startAtUtc: 1 });  // For sorting by date
+EventSchema.index({ mode: 1 });         // For filtering by mode
+EventSchema.index({ tags: 1 });         // For filtering by tags
+
 EventSchema.pre("save", function () {
     const event = this as IEvent;
 
-    if (event.isModified("title") || event.isNew) {
-        event.slug = event.title
-            .toLowerCase()
-            .trim()
-            .replace(/[^\w\s-]/g, "")
-            .replace(/\s+/g, "-")
-            .replace(/-+/g, "-");
-    }
-
+    // Normalize date first
     if (event.isModified("date") || event.isNew) {
         const date = new Date(event.date);
         if (isNaN(date.getTime())) {
@@ -122,6 +131,20 @@ EventSchema.pre("save", function () {
         }
         date.setUTCHours(0, 0, 0, 0);
         event.date = date;
+    }
+
+    // Generate slug from title + date to allow same event name on different dates
+    if (event.isModified("title") || event.isModified("date") || event.isNew) {
+        const titleSlug = event.title
+            .toLowerCase()
+            .trim()
+            .replace(/[^\w\s-]/g, "")
+            .replace(/\s+/g, "-")
+            .replace(/-+/g, "-");
+
+        // Format date as YYYY-MM-DD for slug
+        const dateStr = event.date.toISOString().split('T')[0];
+        event.slug = `${titleSlug}-${dateStr}`;
     }
 
     if (event.isModified("time")) {

@@ -38,11 +38,17 @@ export async function GET(
             { status: 200 }
         );
     } catch (error) {
-        console.error("Error fetching event by slug:", error);
+        // Log detailed error only in development
+        if (process.env.NODE_ENV === "development") {
+            console.error("Error fetching event by slug:", error);
+        }
+
         return NextResponse.json(
             {
                 message: "Failed to fetch event",
-                error: error instanceof Error ? error.message : "Unknown error"
+                ...(process.env.NODE_ENV === "development" && {
+                    error: error instanceof Error ? error.message : "Unknown error"
+                })
             },
             { status: 500 }
         );

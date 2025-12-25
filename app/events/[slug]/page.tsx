@@ -1,6 +1,9 @@
 import Image from "next/image";
 import Link from "next/link";
 import { formatEventDate, formatEventTime, parseArrayField } from "@/lib/utils";
+import { getBaseUrl } from "@/lib/server-url";
+
+export const revalidate = 60;
 
 const EventDetailItem = ({icon, alt, label} : {icon: string, alt: string, label: string}) => (
     <div className="flex flex-row items-center gap-3 py-1">
@@ -16,8 +19,9 @@ export default async function EventDetailsPage({params} : {params: Promise<{slug
     let errorMessage = null;
 
     try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/events/${slug}`, {
-            cache: 'no-store'
+        const baseUrl = await getBaseUrl();
+        const response = await fetch(`${baseUrl}/api/events/${slug}`, {
+            next: { revalidate: 60 }
         });
 
         if (!response.ok) {
@@ -43,8 +47,8 @@ export default async function EventDetailsPage({params} : {params: Promise<{slug
         );
     }
 
-    const formattedDate = formatEventDate(event.date);
-    const formattedTime = formatEventTime(event.time);
+    const formattedDate = formatEventDate(event.date, event.timezone, event.startAtUtc);
+    const formattedTime = formatEventTime(event.time, event.timezone, event.startAtUtc);
 
     // Parse agenda and tags safely
     const agendaItems = parseArrayField(event.agenda || []);
@@ -59,15 +63,6 @@ export default async function EventDetailsPage({params} : {params: Promise<{slug
 
             <div className="details">
                 <div className="content">
-                    <Image
-                        src={event.image}
-                        alt={event.title}
-                        width={800}
-                        height={800}
-                        className="banner mb-3"
-                        priority
-                    />
-
                     <section className="flex-col-gap-2 mb-3">
                         <h2 className="mb-2">Overview</h2>
                         <p className="leading-relaxed">{event.overview}</p>
@@ -115,9 +110,25 @@ export default async function EventDetailsPage({params} : {params: Promise<{slug
                         <section className="flex-col-gap-2 agenda mb-3">
                             <h2 className="mb-2">Agenda</h2>
                             <ul className="space-y-2">
-                                {agendaItems.map((item: string, index: number) => (
-                                    <li key={index} className="leading-relaxed">{item}</li>
-                                ))}
+                                {agendaItems.map((item: string, index: number) => {
+                                    const parts = item.split('|');
+                                    const time = parts[0]?.trim();
+                                    const description = parts[1]?.trim();
+
+                                    return (
+                                        <li key={index} className="leading-relaxed flex gap-4">
+                                            {time && description ? (
+                                                <>
+                                                    <span className="inline-block w-28 flex-shrink-0">{time}</span>
+                                                    <span className="text-light-200">|</span>
+                                                    <span>{description}</span>
+                                                </>
+                                            ) : (
+                                                <span>{item}</span>
+                                            )}
+                                        </li>
+                                    );
+                                })}
                             </ul>
                         </section>
                     )}

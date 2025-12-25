@@ -1,4 +1,4 @@
-export default function BookEventLoading() {
+export default function Loading() {
     return (
         <div className="flex items-center justify-center min-h-[60vh]" role="status">
             <svg
@@ -17,7 +17,7 @@ export default function BookEventLoading() {
                     fill="currentFill"
                 />
             </svg>
-            <span className="sr-only">Loading booking form...</span>
+            <span className="sr-only">Loading events...</span>
         </div>
     );
 }

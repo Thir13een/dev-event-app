@@ -32,7 +32,7 @@ Discover hackathons, conferences, and meetups worldwide with WebGL-powered UI
 |:---:|:---:|:---:|
 | Browse & Filter | ISR Caching (60s) | WebGL Animations |
 | Create Events | MongoDB Direct Queries | Glass Morphism |
-| Book with Email | TypeScript Strict | Dark Mode |
+| Book with Email | TypeScript Strict | Dark Theme |
 | Timezone Support | Server Components | Mobile First |
 | Tag Search | Zero Build Errors | Responsive Grid |
 

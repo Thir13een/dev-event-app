@@ -19,7 +19,11 @@ export default async function EventDetailsPage({params} : {params: Promise<{slug
     let errorMessage = null;
 
     try {
-        const baseUrl = await getBaseUrl();
+        // Use absolute URL for Vercel deployment
+        const baseUrl = process.env.VERCEL_URL
+            ? `https://${process.env.VERCEL_URL}`
+            : await getBaseUrl();
+
         const response = await fetch(`${baseUrl}/api/events/${slug}`, {
             next: { revalidate: 60 }
         });

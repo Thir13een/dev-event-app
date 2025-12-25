@@ -1,15 +1,21 @@
 import "server-only";
 
 export async function getBaseUrl(): Promise<string> {
-    // For Netlify deployment, use environment variables
-    if (process.env.URL) {
-        return process.env.URL; // Netlify automatically sets this
-    }
-
+    // Vercel production/preview
     if (process.env.VERCEL_URL) {
-        return `https://${process.env.VERCEL_URL}`; // Vercel support
+        return `https://${process.env.VERCEL_URL}`;
     }
 
-    // Fallback to localhost for development
-    return process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+    // Vercel production domain (if custom domain is set)
+    if (process.env.VERCEL_PROJECT_PRODUCTION_URL) {
+        return `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`;
+    }
+
+    // Netlify
+    if (process.env.URL) {
+        return process.env.URL;
+    }
+
+    // Development fallback
+    return "http://localhost:3000";
 }

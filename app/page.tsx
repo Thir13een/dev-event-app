@@ -8,7 +8,11 @@ export const revalidate = 60;
 
 const Page = async () => {
     try {
-        const baseUrl = await getBaseUrl();
+        // Use absolute URL for Vercel deployment
+        const baseUrl = process.env.VERCEL_URL
+            ? `https://${process.env.VERCEL_URL}`
+            : await getBaseUrl();
+
         // Fetch only 6 events for featured section
         const response = await fetch(`${baseUrl}/api/events?limit=6`, {
             next: { revalidate: 60 },

@@ -5,7 +5,11 @@ export const revalidate = 60;
 
 const EventsPage = async () => {
     try {
-        const baseUrl = await getBaseUrl();
+        // Use absolute URL for Vercel deployment
+        const baseUrl = process.env.VERCEL_URL
+            ? `https://${process.env.VERCEL_URL}`
+            : await getBaseUrl();
+
         // Fetch all events with high limit for client-side filtering
         // EventsListWithFilters needs all events to filter/sort properly
         const response = await fetch(`${baseUrl}/api/events?limit=100`, {

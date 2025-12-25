@@ -4,41 +4,15 @@ import { IEvent } from "@/database";
 import { formatEventDate, formatEventTime } from "@/lib/utils";
 import { getEvents } from "@/lib/queries";
 
-// Temporarily force dynamic rendering until site is working
-// TODO: Switch back to ISR caching later (export const revalidate = 60)
-export const dynamic = 'force-dynamic';
+export const revalidate = 60;
 
 const Page = async () => {
     try {
         // Fetch only 6 events for featured section directly from MongoDB
         const { events, pagination } = await getEvents(6);
 
-        // Convert MongoDB documents to plain objects for client
-        const featuredEvents = events
-            .filter(event => {
-                const hasRequired = event.date && event.startAtUtc;
-                if (!hasRequired) {
-                    console.log('Filtering out event:', event.title || 'unknown', {
-                        hasDate: !!event.date,
-                        hasStartAtUtc: !!event.startAtUtc
-                    });
-                }
-                return hasRequired;
-            })
-            .map(event => ({
-                ...event,
-                _id: event._id.toString(),
-                date: event.date.toISOString(),
-                startAtUtc: event.startAtUtc.toISOString(),
-                createdAt: event.createdAt?.toISOString() || new Date().toISOString(),
-                updatedAt: event.updatedAt?.toISOString() || new Date().toISOString(),
-            })) as unknown as IEvent[];
-
-        console.log('Events converted successfully');
-
-        const pagination = {
-            total: totalEvents
-        };
+        // Use the fetched events directly (already limited to 6)
+        const featuredEvents = events;
 
         return (
             <section>
@@ -86,13 +60,7 @@ const Page = async () => {
             </section>
         );
     } catch (error) {
-        // Log detailed error for debugging
-        console.error('Error loading events:', {
-            message: error instanceof Error ? error.message : 'Unknown error',
-            stack: error instanceof Error ? error.stack : undefined,
-            error
-        });
-
+        console.error('Failed to fetch events:', error);
         return (
             <section>
                 <h1 className="text-center">

@@ -18,14 +18,16 @@ const EventsPage = async () => {
             .lean();
 
         // Convert MongoDB documents to plain objects for client
-        const events = dbEvents.map(event => ({
-            ...event,
-            _id: event._id.toString(),
-            date: event.date.toISOString(),
-            startAtUtc: event.startAtUtc.toISOString(),
-            createdAt: event.createdAt.toISOString(),
-            updatedAt: event.updatedAt.toISOString(),
-        })) as unknown as IEvent[];
+        const events = dbEvents
+            .filter(event => event.date && event.startAtUtc) // Only include events with required dates
+            .map(event => ({
+                ...event,
+                _id: event._id.toString(),
+                date: event.date.toISOString(),
+                startAtUtc: event.startAtUtc.toISOString(),
+                createdAt: event.createdAt?.toISOString() || new Date().toISOString(),
+                updatedAt: event.updatedAt?.toISOString() || new Date().toISOString(),
+            })) as unknown as IEvent[];
 
         return (
             <section>

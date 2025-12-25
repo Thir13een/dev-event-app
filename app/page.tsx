@@ -2,8 +2,7 @@ import EventCard from "@/components/EventCard";
 import Link from "next/link";
 import { IEvent } from "@/database";
 import { formatEventDate, formatEventTime } from "@/lib/utils";
-import Event from "@/database/event.model";
-import connectDB from "@/lib/mongodb";
+import { getEvents } from "@/lib/queries";
 
 // Temporarily force dynamic rendering until site is working
 // TODO: Switch back to ISR caching later (export const revalidate = 60)
@@ -11,31 +10,8 @@ export const dynamic = 'force-dynamic';
 
 const Page = async () => {
     try {
-        // Query MongoDB directly (avoid HTTP fetch issues on Vercel)
-        console.log('Connecting to MongoDB...');
-        await connectDB();
-        console.log('Connected to MongoDB successfully');
-
-        console.log('Fetching events...');
-        const events = await Event.find()
-            .sort({ createdAt: -1 })
-            .limit(6)
-            .lean();
-
-        console.log(`Found ${events.length} events`);
-
-        // Log first event structure to debug
-        if (events.length > 0) {
-            console.log('First event sample:', {
-                hasDate: !!events[0].date,
-                hasStartAtUtc: !!events[0].startAtUtc,
-                hasCreatedAt: !!events[0].createdAt,
-                fields: Object.keys(events[0])
-            });
-        }
-
-        const totalEvents = await Event.countDocuments();
-        console.log(`Total events in database: ${totalEvents}`);
+        // Fetch only 6 events for featured section directly from MongoDB
+        const { events, pagination } = await getEvents(6);
 
         // Convert MongoDB documents to plain objects for client
         const featuredEvents = events

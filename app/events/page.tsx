@@ -1,7 +1,5 @@
 import EventsListWithFilters from "@/components/EventsListWithFilters";
-import Event from "@/database/event.model";
-import connectDB from "@/lib/mongodb";
-import { IEvent } from "@/database";
+import { getEvents } from "@/lib/queries";
 
 // Temporarily force dynamic rendering until site is working
 // TODO: Switch back to ISR caching later (export const revalidate = 60)
@@ -9,25 +7,9 @@ export const dynamic = 'force-dynamic';
 
 const EventsPage = async () => {
     try {
-        // Query MongoDB directly (avoid HTTP fetch issues on Vercel)
-        await connectDB();
-
-        const dbEvents = await Event.find()
-            .sort({ createdAt: -1 })
-            .limit(100)
-            .lean();
-
-        // Convert MongoDB documents to plain objects for client
-        const events = dbEvents
-            .filter(event => event.date && event.startAtUtc) // Only include events with required dates
-            .map(event => ({
-                ...event,
-                _id: event._id.toString(),
-                date: event.date.toISOString(),
-                startAtUtc: event.startAtUtc.toISOString(),
-                createdAt: event.createdAt?.toISOString() || new Date().toISOString(),
-                updatedAt: event.updatedAt?.toISOString() || new Date().toISOString(),
-            })) as unknown as IEvent[];
+        // Fetch all events directly from MongoDB for client-side filtering
+        // EventsListWithFilters needs all events to filter/sort properly
+        const { events } = await getEvents(100);
 
         return (
             <section>

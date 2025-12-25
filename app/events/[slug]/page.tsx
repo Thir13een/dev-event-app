@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { formatEventDate, formatEventTime, parseArrayField } from "@/lib/utils";
-import { getBaseUrl } from "@/lib/server-url";
+import { getEventBySlug } from "@/lib/queries";
 
 // Temporarily force dynamic rendering until site is working
 // TODO: Switch back to ISR caching later (export const revalidate = 60)
@@ -21,20 +21,11 @@ export default async function EventDetailsPage({params} : {params: Promise<{slug
     let errorMessage = null;
 
     try {
-        // Use absolute URL for Vercel deployment
-        const baseUrl = process.env.VERCEL_URL
-            ? `https://${process.env.VERCEL_URL}`
-            : await getBaseUrl();
+        // Fetch event directly from MongoDB
+        event = await getEventBySlug(slug);
 
-        const response = await fetch(`${baseUrl}/api/events/${slug}`, {
-            next: { revalidate: 60 }
-        });
-
-        if (!response.ok) {
-            errorMessage = `Failed to fetch event (${response.status})`;
-        } else {
-            const data = await response.json();
-            event = data.event;
+        if (!event) {
+            errorMessage = `Event not found`;
         }
     } catch (error) {
         errorMessage = error instanceof Error ? error.message : 'Failed to load event';

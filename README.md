@@ -16,7 +16,7 @@ Discover hackathons, conferences, and meetups worldwide with WebGL-powered UI
 
 <br/>
 
-<a href="https://nextjs-delta-mocha-ywt9alcjpn.vercel.app" style="text-decoration: none;"><strong>🚀 Live Demo</strong></a> • <a href="https://github.com/Thir13een/dev-event-app" style="text-decoration: none;"><strong>⭐ Star Us</strong></a>
+<a href="https://dev-event-jckwa73oc-krishnas-projects-e16ecb05.vercel.app" style="text-decoration: none;"><strong>🚀 Live Demo</strong></a> • <a href="https://github.com/Thir13een/dev-event-app" style="text-decoration: none;"><strong>⭐ Star Us</strong></a>
 
 <br/>
 

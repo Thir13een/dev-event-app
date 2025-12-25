@@ -16,7 +16,7 @@ Discover hackathons, conferences, and meetups worldwide with WebGL-powered UI
 
 <br/>
 
-**[🚀 Live Demo](https://nextjs-delta-mocha-ywt9alcjpn.vercel.app)** • **[⭐ Star Us](https://github.com/Thir13een/dev-event-app)**
+<a href="https://nextjs-delta-mocha-ywt9alcjpn.vercel.app" style="text-decoration: none;"><strong>🚀 Live Demo</strong></a> • <a href="https://github.com/Thir13een/dev-event-app" style="text-decoration: none;"><strong>⭐ Star Us</strong></a>
 
 <br/>
 
@@ -79,10 +79,10 @@ MONGODB_URI=mongodb://localhost:27017/devevent
 <div align="center">
 
 ### Frontend
-![Next.js](https://img.shields.io/badge/-Next.js-000?style=flat&logo=next.js) ![React](https://img.shields.io/badge/-React-61DAFB?style=flat&logo=react&logoColor=black) ![TypeScript](https://img.shields.io/badge/-TypeScript-3178C6?style=flat&logo=typescript) ![Tailwind](https://img.shields.io/badge/-Tailwind-06B6D4?style=flat&logo=tailwindcss) ![OGL](https://img.shields.io/badge/-OGL-FF6B6B?style=flat)
+![Next.js](https://img.shields.io/badge/-Next.js-000?style=flat&logo=next.js&logoColor=white) ![React](https://img.shields.io/badge/-React-61DAFB?style=flat&logo=react&logoColor=black) ![TypeScript](https://img.shields.io/badge/-TypeScript-3178C6?style=flat&logo=typescript&logoColor=white) ![Tailwind](https://img.shields.io/badge/-Tailwind-06B6D4?style=flat&logo=tailwindcss&logoColor=white) ![OGL](https://img.shields.io/badge/-OGL-FF6B6B?style=flat&logoColor=white)
 
 ### Backend
-![MongoDB](https://img.shields.io/badge/-MongoDB-47A248?style=flat&logo=mongodb) ![Mongoose](https://img.shields.io/badge/-Mongoose-880000?style=flat) ![Dayjs](https://img.shields.io/badge/-Dayjs-FF5F5F?style=flat)
+![MongoDB](https://img.shields.io/badge/-MongoDB-47A248?style=flat&logo=mongodb&logoColor=white) ![Mongoose](https://img.shields.io/badge/-Mongoose-880000?style=flat&logoColor=white) ![Dayjs](https://img.shields.io/badge/-Dayjs-FF5F5F?style=flat&logoColor=white)
 
 </div>
 
@@ -250,6 +250,6 @@ Special thanks: [OGL](https://github.com/oframe/ogl) • [Lucide](https://lucide
 
 [![GitHub Stars](https://img.shields.io/github/stars/Thir13een/dev-event-app?style=social)](https://github.com/Thir13een/dev-event-app)
 
-**[⬆ Back to Top](#devevent)**
+<a href="#devevent" style="text-decoration: none;"><strong>⬆ Back to Top</strong></a>
 
 </div>

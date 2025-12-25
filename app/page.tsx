@@ -12,14 +12,20 @@ export const dynamic = 'force-dynamic';
 const Page = async () => {
     try {
         // Query MongoDB directly (avoid HTTP fetch issues on Vercel)
+        console.log('Connecting to MongoDB...');
         await connectDB();
+        console.log('Connected to MongoDB successfully');
 
+        console.log('Fetching events...');
         const events = await Event.find()
             .sort({ createdAt: -1 })
             .limit(6)
             .lean();
 
+        console.log(`Found ${events.length} events`);
+
         const totalEvents = await Event.countDocuments();
+        console.log(`Total events in database: ${totalEvents}`);
 
         // Convert MongoDB documents to plain objects for client
         const featuredEvents = events.map(event => ({
@@ -30,6 +36,8 @@ const Page = async () => {
             createdAt: event.createdAt.toISOString(),
             updatedAt: event.updatedAt.toISOString(),
         })) as unknown as IEvent[];
+
+        console.log('Events converted successfully');
 
         const pagination = {
             total: totalEvents
@@ -81,7 +89,13 @@ const Page = async () => {
             </section>
         );
     } catch (error) {
-        console.error('Failed to fetch events:', error);
+        // Log detailed error for debugging
+        console.error('Error loading events:', {
+            message: error instanceof Error ? error.message : 'Unknown error',
+            stack: error instanceof Error ? error.stack : undefined,
+            error
+        });
+
         return (
             <section>
                 <h1 className="text-center">

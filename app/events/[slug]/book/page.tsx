@@ -12,7 +12,7 @@ export default async function BookEventPage({params}: {params: Promise<{slug: st
     let errorMessage = null;
 
     try {
-        const baseUrl = await getBaseUrl();
+        const baseUrl = getBaseUrl();
         const response = await fetch(`${baseUrl}/api/events/${slug}`, {
             next: { revalidate: 60 }
         });

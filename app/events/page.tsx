@@ -5,7 +5,7 @@ export const revalidate = 60;
 
 const EventsPage = async () => {
     try {
-        const baseUrl = await getBaseUrl();
+        const baseUrl = getBaseUrl();
         // Fetch all events with high limit for client-side filtering
         // EventsListWithFilters needs all events to filter/sort properly
         const response = await fetch(`${baseUrl}/api/events?limit=100`, {

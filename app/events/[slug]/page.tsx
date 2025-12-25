@@ -19,7 +19,7 @@ export default async function EventDetailsPage({params} : {params: Promise<{slug
     let errorMessage = null;
 
     try {
-        const baseUrl = await getBaseUrl();
+        const baseUrl = getBaseUrl();
         const response = await fetch(`${baseUrl}/api/events/${slug}`, {
             next: { revalidate: 60 }
         });

@@ -1,14 +1,14 @@
-import "server-only";
-import { headers } from "next/headers";
-
-export async function getBaseUrl(): Promise<string> {
-    const requestHeaders = await headers();
-    const host = requestHeaders.get("x-forwarded-host") || requestHeaders.get("host");
-    const protocol = requestHeaders.get("x-forwarded-proto") || "http";
-
-    if (!host) {
-        return "http://localhost:3000";
+export function getBaseUrl(): string {
+    // Use NEXT_PUBLIC_BASE_URL if explicitly set
+    if (process.env.NEXT_PUBLIC_BASE_URL) {
+        return process.env.NEXT_PUBLIC_BASE_URL;
     }
 
-    return `${protocol}://${host}`;
+    // On Vercel, use VERCEL_URL (automatically provided)
+    if (process.env.VERCEL_URL) {
+        return `https://${process.env.VERCEL_URL}`;
+    }
+
+    // Fallback to localhost for development
+    return "http://localhost:3000";
 }

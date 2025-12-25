@@ -8,7 +8,7 @@ export const revalidate = 60;
 
 const Page = async () => {
     try {
-        const baseUrl = await getBaseUrl();
+        const baseUrl = getBaseUrl();
         // Fetch only 6 events for featured section
         const response = await fetch(`${baseUrl}/api/events?limit=6`, {
             next: { revalidate: 60 },

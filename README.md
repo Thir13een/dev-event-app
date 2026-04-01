@@ -253,3 +253,11 @@ Special thanks: [OGL](https://github.com/oframe/ogl) • [Lucide](https://lucide
 <a href="#devevent" style="text-decoration: none;"><strong>⬆ Back to Top</strong></a>
 
 </div>
+
+## 👥 Team
+
+| Member | GitHub |
+|---|---|
+| Krish | [@Thir13een](https://github.com/Thir13een) |
+| Shweta | [@shwetabankar54](https://github.com/shwetabankar54) |
+

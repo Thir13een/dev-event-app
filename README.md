@@ -261,3 +261,22 @@ Special thanks: [OGL](https://github.com/oframe/ogl) • [Lucide](https://lucide
 | Krish | [@Thir13een](https://github.com/Thir13een) |
 | Shweta | [@shwetabankar54](https://github.com/shwetabankar54) |
 
+
+
+<br/>
+
+<div align="center">
+
+<h3>🤝 Built By</h3>
+
+<a href="https://github.com/Thir13een">
+  <img src="https://github.com/Thir13een.png" width="70" style="border-radius:50%"/>
+  <br/><sub><b>Krish</b></sub>
+</a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<a href="https://github.com/shwetabankar54">
+  <img src="https://github.com/shwetabankar54.png" width="70" style="border-radius:50%"/>
+  <br/><sub><b>Shweta</b></sub>
+</a>
+
+</div>

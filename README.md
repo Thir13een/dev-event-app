@@ -1,10 +1,11 @@
-[![Krish](https://img.shields.io/badge/Krish-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Thir13een) [![Shweta](https://img.shields.io/badge/Shweta-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/shwetabankar54)
-
 <div align="center">
 
 # DevEvent
 
 ### 🎯 *The Hub for Every Dev Event You Can't Miss*
+
+
+**🤝 Built by**   [![Krish](https://img.shields.io/badge/Krish-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Thir13een) [![Shweta](https://img.shields.io/badge/Shweta-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/shwetabankar54)
 
 Discover hackathons, conferences, and meetups worldwide with WebGL-powered UI
 
